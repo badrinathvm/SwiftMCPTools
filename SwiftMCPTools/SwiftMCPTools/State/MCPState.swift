@@ -18,5 +18,6 @@ class MCPState {
     var model: MCPModel = .openai
     var messages: [ChatMessage] = []
     var isLoading: Bool = false
+    var errorMessage: String? = nil
 }
 

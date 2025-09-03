@@ -18,5 +18,6 @@ struct ResultAction {
     func execute() {
         state.messages.removeAll()
         state.text = ""
+        state.errorMessage = nil
     }
 }
