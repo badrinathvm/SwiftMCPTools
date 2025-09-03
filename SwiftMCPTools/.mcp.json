@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "swift-dev-tools": {
+      "type": "stdio",
+      "command": "swift-dev-tools-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "enabledMcpjsonServers": [
+    "swift-dev-tools"
+  ],
+  "enableAllProjectMcpServers": true
+}
