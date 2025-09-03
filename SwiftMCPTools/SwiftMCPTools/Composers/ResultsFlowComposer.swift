@@ -15,10 +15,11 @@ struct ResultsFlowComposer {
     ) -> ResultsFlow<ResultsDisplayView> {
         ResultsFlow(
             state: state,
-            resultsView: { messages, isLoading in
+            resultsView: { messages, isLoading, errorMessage in
                 ResultsDisplayView(
                     messages: messages,
                     isLoading: isLoading,
+                    errorMessage: errorMessage,
                     onNewQuestion: onNewQuestion
                 )
             }
@@ -28,17 +29,17 @@ struct ResultsFlowComposer {
 
 struct ResultsFlow<ResultsView: View>: View {
     @State private var state: MCPState
-    private var resultsView: ([ChatMessage], Bool) -> ResultsView
+    private var resultsView: ([ChatMessage], Bool, String?) -> ResultsView
     
     init(
         state: MCPState,
-        @ViewBuilder resultsView: @escaping ([ChatMessage], Bool) -> ResultsView
+        @ViewBuilder resultsView: @escaping ([ChatMessage], Bool, String?) -> ResultsView
     ) {
         self.state = state
         self.resultsView = resultsView
     }
     
     var body: some View {
-        self.resultsView(state.messages, state.isLoading)
+        self.resultsView(state.messages, state.isLoading, state.errorMessage)
     }
 }

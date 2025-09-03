@@ -28,6 +28,7 @@ struct InputAction {
     
     func execute() async {
         do {
+            // Clear any previous error and start loading
             state.isLoading = true
             
             let userMessage = ChatMessage(
@@ -47,8 +48,19 @@ struct InputAction {
             
             state.isLoading = false
         } catch {
-            print("Error: \(error)")
+            logger.logError("Error in InputAction: \(error)")
             state.isLoading = false
+            
+            // Set user-friendly error message
+            if error is DecodingError {
+                state.errorMessage = "Failed to parse response from the server. Please try again."
+            } else if error.localizedDescription.contains("network") || error.localizedDescription.contains("Internet") {
+                state.errorMessage = "Network connection failed. Please check your internet connection and try again."
+            } else if error.localizedDescription.contains("timeout") {
+                state.errorMessage = "Request timed out. The server might be busy. Please try again."
+            } else {
+                state.errorMessage = "Something went wrong. Please try again. If the problem persists, check your API configuration."
+            }
         }
     }
     

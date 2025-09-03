@@ -10,14 +10,15 @@ import SwiftUI
 struct ResultsDisplayView: View {
     let messages: [ChatMessage]
     let isLoading: Bool
+    let errorMessage: String?
     let onNewQuestion: () -> Void
     
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    if messages.isEmpty && !isLoading {
-                        // Welcome message when no messages
+                    if messages.isEmpty && !isLoading && errorMessage == nil {
+                        // Welcome message when no messages and no errors
                         VStack(spacing: 12) {
                             Image(systemName: "sparkles.rectangle.stack")
                                 .font(.system(size: 60))
@@ -40,19 +41,28 @@ struct ResultsDisplayView: View {
                                 .multilineTextAlignment(.center)
                         }
                         .padding(.vertical, 40)
-                    } else if !messages.isEmpty {
-                        ForEach(Array(messages.enumerated()), id: \.offset) { index, message in
-                            if message.message.role == .assistant {
-                                ResultMessageView(
-                                    message: message,
-                                    responseIndex: messages.filter { $0.message.role == .assistant }.firstIndex(where: { $0.id == message.id }) ?? 0
-                                )
-                                .id(index)
+                    } else {
+                        // Show error message if present
+                        if let errorMessage = errorMessage {
+                            ErrorMessageView(errorMessage: errorMessage)
+                                .id("error-message")
+                        }
+                        
+                        // Show assistant messages
+                        if !messages.isEmpty {
+                            ForEach(Array(messages.enumerated()), id: \.offset) { index, message in
+                                if message.message.role == .assistant {
+                                    ResultMessageView(
+                                        message: message,
+                                        responseIndex: messages.filter { $0.message.role == .assistant }.firstIndex(where: { $0.id == message.id }) ?? 0
+                                    )
+                                    .id(index)
+                                }
                             }
                         }
                         
-                        // Action buttons at the bottom of results
-                        if !isLoading {
+                        // Action buttons at the bottom of results (show if we have messages or an error)
+                        if !isLoading && (!messages.isEmpty || errorMessage != nil) {
                             ActionButtonsView(
                                 messages: messages,
                                 onNewQuestion: onNewQuestion

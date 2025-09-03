@@ -18,7 +18,7 @@ struct InputFlowComposer {
                     inputAreaFlow: InputAreaFlowComposer.compose(
                         state: state,
                         onSend: {
-                            let mcpService = SwiftVersionTool()
+                            let mcpService = DeveloperToolsService()
                             Task { @MainActor in
                                 await InputAction(
                                     state: state,
