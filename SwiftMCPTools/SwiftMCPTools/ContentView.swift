@@ -31,6 +31,9 @@ struct MCPFlowComposer<Detail: View>: View {
 
 struct MCPComposer {
      func compose(state: MCPState) -> some View {
-         return MCPDetail(inputFlow: InputFlowComposer.compose(state: state))
+         return MCPDetail(
+            headerFlow: HeaderFlowComposer.compose(),
+            inputFlow: InputFlowComposer.compose(state: state)
+         )
     }
 }

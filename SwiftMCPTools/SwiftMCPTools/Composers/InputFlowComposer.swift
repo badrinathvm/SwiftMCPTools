@@ -9,23 +9,35 @@ import Foundation
 import SwiftUI
 
 struct InputFlowComposer {
-    static func compose(state: MCPState) -> InputFlow<InputView> {
-        InputFlow(
+    static func compose(state: MCPState) -> InputFlow<InputView<InputAreaFlow<TopInputAreaView>, LoadingFlow<LoadingIndicatorView>, ResultsFlow<ResultsDisplayView>>> {
+        
+        return InputFlow(
             state: state,
             input: { state in
                 InputView(
-                    state: state,
-                    onSend: {
-                        let mcpService = SwiftVersionTool()
-                        Task { @MainActor in
-                            await InputAction(
-                                state: state,
-                                useCase: InputActionFactory.usecase(mcpService: mcpService),
-                                mcpService: mcpService,
-                                logger: ConsoleLogger()
-                            ).execute()
+                    inputAreaFlow: InputAreaFlowComposer.compose(
+                        state: state,
+                        onSend: {
+                            let mcpService = SwiftVersionTool()
+                            Task { @MainActor in
+                                await InputAction(
+                                    state: state,
+                                    useCase: InputActionFactory.usecase(mcpService: mcpService),
+                                    mcpService: mcpService,
+                                    logger: ConsoleLogger()
+                                ).execute()
+                            }
                         }
-                    }
+                    ),
+                    loadingFlow:
+                        LoadingFlowComposer.compose(state: state),
+                    resultsFlow:
+                        ResultsFlowComposer.compose(
+                            state: state,
+                            onNewQuestion: {
+                                ResultAction(state: state).execute()
+                            }
+                        )
                 )
             }
         )

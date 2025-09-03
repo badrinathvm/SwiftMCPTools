@@ -8,51 +8,36 @@
 import Foundation
 import SwiftUI
 
-struct InputView: View {
-    @State private var state: MCPState
-    var onSend: () -> Void
+struct InputView<
+    InputAreaFlow: View,
+    LoadingFlow: View,
+    ResultsFlow: View
+>: View {
+    
+    var inputAreaFlow: InputAreaFlow
+    var loadingFlow: LoadingFlow
+    var resultsFlow: ResultsFlow
     
     init(
-        state: MCPState,
-        onSend: @escaping () -> Void
+        inputAreaFlow: InputAreaFlow,
+        loadingFlow: LoadingFlow,
+        resultsFlow: ResultsFlow
     ) {
-        self.state = state
-        self.onSend = onSend
+        self.inputAreaFlow = inputAreaFlow
+        self.loadingFlow = loadingFlow
+        self.resultsFlow = resultsFlow
     }
     
     var body: some View {
-        VStack {
-            // Always display messages
-            ForEach(Array(state.messages.enumerated()), id: \.offset) { index, message in
-                let isUser = message.message.role == .user
-                VStack {
-                    Text(message.content)
-                        .padding(8)
-                        .background(isUser ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
-                        .cornerRadius(8)
-                }
-                .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
-            }
+        VStack(spacing: 0) {
+            // Input area
+            self.inputAreaFlow
             
-            // Show loading indicator when loading
-            if state.isLoading {
-                ProgressView("Loading...")
-                    .padding()
-            }
+            // Loading indicator  
+            self.loadingFlow
             
-            // Always show input field (but disable when loading)
-            HStack {
-                TextField("Enter your message", text: $state.text)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .disabled(state.isLoading)
-                
-                Button("Send") {
-                    self.onSend()
-                }
-                .padding(.leading, 8)
-                .disabled(state.text.trimmingCharacters(in: .whitespaces).isEmpty || state.isLoading)
-            }
-            .padding()
+            // Results display
+            self.resultsFlow
         }
     }
 }
